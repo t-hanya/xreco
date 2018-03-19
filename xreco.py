@@ -50,6 +50,7 @@ class ArgumentParser(argparse.ArgumentParser):
         self._name = name
         self._output_root = output_root
         self._output_option_name = output_option_name
+        self._ignore_keys = ('comment', output_option_name)
 
         super().__init__(**kwargs)
         if add_comment_option:
@@ -68,6 +69,12 @@ class ArgumentParser(argparse.ArgumentParser):
         dirname += datetime.datetime.now().strftime('%Y%m%d')
         if git_data:
             dirname += '_' + git_data['head'][:7]
+        for k, v in vars(args).items():
+            if k in self._ignore_keys:
+                continue
+            default = self.get_default(k)
+            if v != default:
+                dirname += '_{}-{}'.format(k, v)
 
         # make directory
         output_dir = os.path.abspath(
