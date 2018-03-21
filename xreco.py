@@ -58,6 +58,7 @@ class ArgumentParser(argparse.ArgumentParser):
                               help='comments on this experiment.')
 
     def parse_args(self, *args, **kwargs):
+        """Override ``parse_args`` to dump experiment info to output directory."""
         # parse command line arguments
         args = super().parse_args(*args, **kwargs)
 
