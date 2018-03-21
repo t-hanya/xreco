@@ -12,6 +12,10 @@ import json
 import subprocess
 
 
+GIT_INFO_AS_DICT = ('head', 'branch', 'remote')
+GIT_INFO_AS_TEXT = ('diff', 'log', 'status')
+
+
 def _is_under_git_control():
     """Check whether current directory is under git control."""
     ret = subprocess.run('git rev-parse'.split(),
@@ -26,17 +30,24 @@ def _issue_command(command):
     return out.decode('utf-8')
 
 
+def _split_lines(text):
+    """Split multi-line text content into list of string."""
+    lines = [l.strip() for l in text.split('\n') if l.strip()]
+    return lines
+
+
 def check_git_status():
     """Check git repository status."""
     if not _is_under_git_control():
         return None
 
     git_data = {
-        'head': _issue_command('git rev-parse HEAD'),
-        'branch': _issue_command('git branch'),
+        'head': _issue_command('git rev-parse HEAD').strip(),
+        'branch': _issue_command('git rev-parse --abbrev-ref HEAD').strip(),
         'diff': _issue_command('git diff'),
         'status': _issue_command('git status'),
         'log': _issue_command('git log -n 30'),
+        'remote': _split_lines(_issue_command('git remote -v')),
     }
     return git_data
 
@@ -92,7 +103,15 @@ class ArgumentParser(argparse.ArgumentParser):
         with open(os.path.join(args.out, 'args'), 'w') as f:
             json.dump(vars(args), f, indent=2)
         if git_data:
+            # save ``git`` file
+            git_data_as_dict = {k: v for k, v in git_data.items()
+                                if k in GIT_INFO_AS_DICT}
             with open(os.path.join(args.out, 'git'), 'w') as f:
-                json.dump(git_data, f, indent=2)
+                json.dump(git_data_as_dict, f, indent=2)
+            # save git-XXXX.txt
+            for k in GIT_INFO_AS_TEXT:
+                fname = 'git-{}.txt'.format(k)
+                with open(os.path.join(args.out, fname), 'w') as f:
+                    f.write(git_data[k])
 
         return args
