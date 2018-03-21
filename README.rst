@@ -64,6 +64,6 @@ Created contents::
 
 ----
 
-Copyright(c) 2018 Toshinori Hanya
-Released under the MIT License
-http://opensource.org/licenses/mit-license.php
+| Copyright(c) 2018 Toshinori Hanya
+| Released under the MIT License
+| http://opensource.org/licenses/mit-license.php
