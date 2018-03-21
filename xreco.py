@@ -67,7 +67,6 @@ def _get_execution_count_with_same_name(output_root, dirname):
             execution_count = 1
             continue
         if pattern.match(name):
-            print(name)
             execution_count = int(name.split('-')[-1])
     return execution_count
 
