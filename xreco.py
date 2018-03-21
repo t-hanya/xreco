@@ -8,11 +8,13 @@ import argparse
 import datetime
 import os
 import json
+import re
 import subprocess
 
 
 GIT_INFO_AS_DICT = ('head', 'branch', 'remote')
 GIT_INFO_AS_TEXT = ('diff', 'log', 'status')
+EXEC_COUNT_PATTERN = '_run-\d+'
 
 
 def _is_under_git_control():
@@ -49,6 +51,25 @@ def check_git_status():
         'remote': _split_lines(_issue_command('git remote -v')),
     }
     return git_data
+
+
+def _get_execution_count_with_same_name(output_root, dirname):
+    """Get execution count with same name."""
+    if not os.path.exists(output_root):
+        return 0
+    existing_names = sorted(os.listdir(output_root))
+    execution_count = 0
+    pattern = re.compile('^' + dirname + EXEC_COUNT_PATTERN + '$')
+    for name in existing_names:
+        if not name.startswith(dirname):
+            continue
+        if name == dirname:
+            execution_count = 1
+            continue
+        if pattern.match(name):
+            print(name)
+            execution_count = int(name.split('-')[-1])
+    return execution_count
 
 
 class ArgumentParser(argparse.ArgumentParser):
@@ -88,6 +109,10 @@ class ArgumentParser(argparse.ArgumentParser):
             default = self.get_default(k)
             if v != default:
                 dirname += '_{}-{}'.format(k, v)
+        exec_count = _get_execution_count_with_same_name(
+            args.output_root, dirname)
+        if exec_count:
+            dirname += '_run-{}'.format(exec_count + 1)
 
         # make directory
         output_dir = os.path.abspath(
