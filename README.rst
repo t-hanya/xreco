@@ -13,9 +13,6 @@ Sample program ( ``main.py`` ):
 
 .. code-block:: python
 
-   # -*- coding: utf-8 -*-
-
-
    from xreco import ArgumentParser
 
 
