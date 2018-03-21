@@ -58,11 +58,13 @@ class ArgumentParser(argparse.ArgumentParser):
                  output_option_name='out', add_comment_option=True,
                  **kwargs):
         self._name = name
-        self._output_root = output_root
         self._output_option_name = output_option_name
-        self._ignore_keys = ('comment', output_option_name)
+        self._ignore_keys = ('comment', 'output_root', output_option_name)
 
         super().__init__(**kwargs)
+
+        self.add_argument('--output-root', type=str, default=output_root,
+                          help='path to root of experiment directories.')
         if add_comment_option:
             self.add_argument('--comment', type=str, default=None,
                               help='comments on this experiment.')
@@ -89,7 +91,7 @@ class ArgumentParser(argparse.ArgumentParser):
 
         # make directory
         output_dir = os.path.abspath(
-                         os.path.join(self._output_root, dirname))
+                         os.path.join(args.output_root, dirname))
         try:
             os.makedirs(output_dir)
         except OSError:
