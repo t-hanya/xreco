@@ -122,8 +122,9 @@ class ArgumentParser(argparse.ArgumentParser):
         except OSError:
             pass
 
-        # set 'out' key to namespace object
+        # set 'out' key to namespace object and remove 'output_root' key
         setattr(args, self._output_option_name, output_dir)
+        del args.output_root
 
         # dump collected info
         with open(os.path.join(args.out, 'args'), 'w') as f:
