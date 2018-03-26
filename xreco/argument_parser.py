@@ -10,6 +10,11 @@ import os
 import json
 import re
 import subprocess
+from subprocess import STDOUT
+try:
+    from subprocess import DEVNULL  # py3
+except ImportError:
+    DEVNULL = open(os.devnull, 'wb')
 
 
 GIT_INFO_AS_DICT = ('head', 'branch', 'remote')
@@ -19,10 +24,10 @@ EXEC_COUNT_PATTERN = '_run-\d+'
 
 def _is_under_git_control():
     """Check whether current directory is under git control."""
-    ret = subprocess.run('git rev-parse'.split(),
-                         stdout=subprocess.DEVNULL,
-                         stderr=subprocess.DEVNULL)
-    return ret.returncode == 0
+    ret = subprocess.call('git rev-parse'.split(),
+                          stdout=DEVNULL,
+                          stderr=STDOUT)
+    return ret == 0
 
 
 def _issue_command(command):
@@ -81,7 +86,7 @@ class ArgumentParser(argparse.ArgumentParser):
         self._output_option_name = output_option_name
         self._ignore_keys = ('comment', 'output_root', output_option_name)
 
-        super().__init__(**kwargs)
+        super(ArgumentParser, self).__init__(**kwargs)
 
         self.add_argument('--output-root', type=str, default=output_root,
                           help='path to root of experiment directories.')
@@ -92,7 +97,7 @@ class ArgumentParser(argparse.ArgumentParser):
     def parse_args(self, *args, **kwargs):
         """Override ``parse_args`` to dump experiment info to output directory."""
         # parse command line arguments
-        args = super().parse_args(*args, **kwargs)
+        args = super(ArgumentParser, self).parse_args(*args, **kwargs)
 
         # check git status
         git_data = check_git_status()
