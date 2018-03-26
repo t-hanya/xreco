@@ -7,5 +7,6 @@ setup(name='xreco',
       description='Utility to record experiment information',
       author='Toshinori Hanya',
       url='https://github.com/t-hanya/xreco',
+      license='MIT',
       packages=['xreco'],
       )
