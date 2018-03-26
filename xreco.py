@@ -81,7 +81,7 @@ class ArgumentParser(argparse.ArgumentParser):
         self._output_option_name = output_option_name
         self._ignore_keys = ('comment', 'output_root', output_option_name)
 
-        super().__init__(**kwargs)
+        super(ArgumentParser, self).__init__(**kwargs)
 
         self.add_argument('--output-root', type=str, default=output_root,
                           help='path to root of experiment directories.')
@@ -92,7 +92,7 @@ class ArgumentParser(argparse.ArgumentParser):
     def parse_args(self, *args, **kwargs):
         """Override ``parse_args`` to dump experiment info to output directory."""
         # parse command line arguments
-        args = super().parse_args(*args, **kwargs)
+        args = super(ArgumentParser, self).parse_args(*args, **kwargs)
 
         # check git status
         git_data = check_git_status()
